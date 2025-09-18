@@ -66,13 +66,15 @@ class PokemonService {
       }
     }
     
-    // Crear un nuevo Pokémon con las debilidades calculadas
+  // Crear un nuevo Pokémon con las debilidades calculadas
     return Pokemon(
       id: pokemon.id,
       name: pokemon.name,
       imageUrl: pokemon.imageUrl,
       types: pokemon.types,
       weaknesses: allWeaknesses.toList(),
+      attacks: pokemon.attacks,
+      stats: pokemon.stats,
     );
   }
 }

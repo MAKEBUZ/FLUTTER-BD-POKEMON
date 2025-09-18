@@ -4,6 +4,8 @@ class Pokemon {
   final String imageUrl;
   final List<String> types;
   final List<String> weaknesses;
+  final List<String> attacks;
+  final Map<String, int> stats;
 
   Pokemon({
     required this.id,
@@ -11,6 +13,8 @@ class Pokemon {
     required this.imageUrl,
     required this.types,
     required this.weaknesses,
+    this.attacks = const [],
+    this.stats = const {},
   });
 
   factory Pokemon.fromJson(Map<String, dynamic> json) {
@@ -30,6 +34,22 @@ class Pokemon {
         .map((type) => type['type']['name'].toString().capitalize())
         .toList();
     
+    // Extraer ataques (moves)
+    final List<String> attacks = (json['moves'] as List?)
+        ?.take(4) // Tomar solo los primeros 4 ataques
+        ?.map((move) => move['move']['name'].toString().replaceAll('-', ' ').capitalize())
+        ?.toList() ?? [];
+    
+    // Extraer estadísticas
+    final Map<String, int> stats = {};
+    if (json['stats'] != null) {
+      for (var stat in json['stats']) {
+        String statName = stat['stat']['name'].toString();
+        int statValue = stat['base_stat'];
+        stats[statName] = statValue;
+      }
+    }
+    
     // Las debilidades no vienen directamente en la API, se calcularán en el servicio
     // Por ahora dejamos una lista vacía
     final List<String> weaknesses = [];
@@ -40,6 +60,8 @@ class Pokemon {
       imageUrl: imageUrl,
       types: types,
       weaknesses: weaknesses,
+      attacks: attacks,
+      stats: stats,
     );
   }
 }

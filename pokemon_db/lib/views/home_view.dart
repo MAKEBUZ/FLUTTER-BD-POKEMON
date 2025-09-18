@@ -19,7 +19,6 @@ class HomeView extends StatelessWidget {
         title: const Text('Pokédex'),
         centerTitle: true,
         actions: [
-          // Botón para ir a la vista de equipo
           IconButton(
             onPressed: () => Get.to(() => TeamView()),
             icon: const Icon(Icons.group),
@@ -76,142 +75,177 @@ class HomeView extends StatelessWidget {
                           controller.error.value,
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontSize: 18),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 }
                 
                 // Mostrar resultado de la búsqueda
                 if (controller.pokemon.value != null) {
-                  return Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(() => PokemonDetailView());
+                    },
+                    child: Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(controller.getBackgroundColor()).withOpacity(0.7),
-                            Color(controller.getBackgroundColor()),
-                          ],
-                        ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                            // ID y nombre
-                            Text(
-                              '#${controller.pokemon.value!.id} - ${controller.pokemon.value!.name}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            
-                            // Imagen
-                            Hero(
-                              tag: 'pokemon-${controller.pokemon.value!.id}',
-                              child: Image.network(
-                                controller.pokemon.value!.imageUrl,
-                                height: 200,
-                                fit: BoxFit.contain,
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return const Center(child: CircularProgressIndicator());
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(Icons.broken_image, size: 100);
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            
-                            // Tipos
-                            Row(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(controller.getBackgroundColor()).withOpacity(0.7),
+                              Color(controller.getBackgroundColor()),
+                            ],
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: controller.pokemon.value!.types
-                                  .map((type) => Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                                        child: Chip(
-                                          label: Text(
-                                            type,
-                                            style: const TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor: Color(controller.typeColors[type] ?? 0xFF78C850),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 20),
-                            
-                            // Botones de acción
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                // Botón Favorito (Agregar al equipo)
-                                Obx(() => ElevatedButton.icon(
-                                  onPressed: teamController.isInTeam(controller.pokemon.value!.id)
-                                      ? null
-                                      : () async {
-                                          final success = await teamController.addPokemon(controller.pokemon.value!);
-                                          if (success) {
-                                            Get.snackbar(
-                                              'Éxito',
-                                              '${controller.pokemon.value!.name} agregado al equipo',
-                                              backgroundColor: Colors.green,
-                                              colorText: Colors.white,
-                                              snackPosition: SnackPosition.BOTTOM,
-                                            );
-                                          }
-                                        },
-                                  icon: Icon(
-                                    teamController.isInTeam(controller.pokemon.value!.id)
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
+                                // ID y nombre
+                                Text(
+                                  '#${controller.pokemon.value!.id} - ${controller.pokemon.value!.name}',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                  label: Text(
-                                    teamController.isInTeam(controller.pokemon.value!.id)
-                                        ? 'En Equipo'
-                                        : 'Favorito',
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: teamController.isInTeam(controller.pokemon.value!.id)
-                                        ? Colors.red.shade300
-                                        : Colors.red.shade600,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                )),
+                                ),
+                                const SizedBox(height: 20),
                                 
-                                // Botón Ver Detalles
-                                ElevatedButton.icon(
-                                  onPressed: () => Get.to(() => PokemonDetailView()),
-                                  icon: const Icon(Icons.info_outline),
-                                  label: const Text('Detalles'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue.shade600,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
+                                // Imagen
+                                Hero(
+                                  tag: 'pokemon-${controller.pokemon.value!.id}',
+                                  child: Image.network(
+                                    controller.pokemon.value!.imageUrl,
+                                    height: 200,
+                                    fit: BoxFit.contain,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(child: CircularProgressIndicator());
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.broken_image, size: 100);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                
+                                // Tipos
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: controller.pokemon.value!.types
+                                      .map((type) => Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                                            child: Chip(
+                                              label: Text(
+                                                type,
+                                                style: const TextStyle(color: Colors.white),
+                                              ),
+                                              backgroundColor: Color(controller.typeColors[type] ?? 0xFF78C850),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+
+                                // Ataques
+                                if (controller.pokemon.value!.attacks.isNotEmpty) ...[
+                                  const SizedBox(height: 15),
+                                  const Text(
+                                    'Ataques:',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    alignment: WrapAlignment.center,
+                                    spacing: 6,
+                                    runSpacing: 4,
+                                    children: controller.pokemon.value!.attacks
+                                        .take(4)
+                                        .map((attack) => Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(0.2),
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                attack,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ))
+                                        .toList(),
+                                  ),
+                                ],
+
+                                // Estadísticas principales
+                                if (controller.pokemon.value!.stats.isNotEmpty) ...[
+                                  const SizedBox(height: 15),
+                                  const Text(
+                                    'Estadísticas:',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _buildStatChip('HP', controller.pokemon.value!.stats['hp'] ?? 0),
+                                      _buildStatChip('ATK', controller.pokemon.value!.stats['attack'] ?? 0),
+                                      _buildStatChip('DEF', controller.pokemon.value!.stats['defense'] ?? 0),
+                                      _buildStatChip('SPD', controller.pokemon.value!.stats['speed'] ?? 0),
+                                    ],
+                                  ),
+                                ],
+                                
+                                const SizedBox(height: 15),
+                                const Text(
+                                  'Toca para ver más detalles',
+                                  style: TextStyle(color: Colors.white70),
                                 ),
                               ],
                             ),
                             
-                            const SizedBox(height: 10),
-                            const Text(
-                              'Agrega a favoritos o ve más detalles',
-                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                            // Botón favorito en la esquina superior derecha
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Obx(() => FloatingActionButton.small(
+                                onPressed: () {
+                                  if (teamController.isInTeam(controller.pokemon.value!.id)) {
+                                    teamController.removeFromTeam(controller.pokemon.value!.id);
+                                  } else {
+                                    teamController.addToTeam(controller.pokemon.value!);
+                                  }
+                                },
+                                backgroundColor: teamController.isInTeam(controller.pokemon.value!.id) 
+                                    ? Colors.red.shade600 
+                                    : Colors.white,
+                                child: Icon(
+                                  teamController.isInTeam(controller.pokemon.value!.id) 
+                                      ? Icons.favorite 
+                                      : Icons.favorite_border,
+                                  color: teamController.isInTeam(controller.pokemon.value!.id) 
+                                      ? Colors.white 
+                                      : Colors.red.shade600,
+                                ),
+                              )),
                             ),
                           ],
                         ),
@@ -239,6 +273,36 @@ class HomeView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatChip(String label, int value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value.toString(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
