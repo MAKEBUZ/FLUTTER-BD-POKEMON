@@ -1,19 +1,15 @@
 import 'package:get/get.dart';
 import '../models/pokemon_model.dart';
 import '../services/pokemon_service.dart';
-import '../services/favorites_service.dart';
-import 'team_controller.dart';
 
 class PokemonController extends GetxController {
   final PokemonService _pokemonService = PokemonService();
-  final FavoritesService _favoritesService = FavoritesService();
   
   // Variables observables
   final Rx<Pokemon?> pokemon = Rx<Pokemon?>(null);
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   final RxString searchQuery = ''.obs;
-  final RxBool isFavorite = false.obs;
   
   // Mapa de colores según el tipo de Pokémon
   final Map<String, int> typeColors = {
@@ -48,57 +44,11 @@ class PokemonController extends GetxController {
       
       final Pokemon result = await _pokemonService.getPokemon(nameOrId);
       pokemon.value = result;
-      
-      // Verificar si está en favoritos
-      await _checkIfFavorite(result.id);
     } catch (e) {
       error.value = 'No se encontró el Pokémon. Intenta con otro nombre o número.';
       pokemon.value = null;
-      isFavorite.value = false;
     } finally {
       isLoading.value = false;
-    }
-  }
-  
-  // Verificar si el Pokémon actual está en favoritos
-  Future<void> _checkIfFavorite(int pokemonId) async {
-    isFavorite.value = await _favoritesService.isFavorite(pokemonId);
-  }
-  
-  // Alternar estado de favorito
-  Future<void> toggleFavorite() async {
-    if (pokemon.value == null) return;
-    
-    try {
-      if (isFavorite.value) {
-        await _favoritesService.removeFavorite(pokemon.value!.id);
-        isFavorite.value = false;
-        Get.snackbar(
-          'Removido',
-          '${pokemon.value!.name} fue removido del equipo',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      } else {
-        await _favoritesService.addToFavorites(pokemon.value!);
-        isFavorite.value = true;
-        Get.snackbar(
-          'Agregado al Equipo',
-          '${pokemon.value!.name} fue agregado a tu equipo',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-      
-      // Actualizar el equipo si el controlador existe
-      if (Get.isRegistered<TeamController>()) {
-        final teamController = Get.find<TeamController>();
-        await teamController.loadFavorites();
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'No se pudo actualizar el estado de favorito',
-        snackPosition: SnackPosition.BOTTOM,
-      );
     }
   }
   
@@ -118,6 +68,5 @@ class PokemonController extends GetxController {
     pokemon.value = null;
     error.value = '';
     searchQuery.value = '';
-    isFavorite.value = false;
   }
 }

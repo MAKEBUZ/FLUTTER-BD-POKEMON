@@ -73,7 +73,6 @@ class PokemonService {
       imageUrl: pokemon.imageUrl,
       types: pokemon.types,
       weaknesses: allWeaknesses.toList(),
-      moves: pokemon.moves, // Mantener los ataques
     );
   }
 }

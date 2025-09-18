@@ -4,7 +4,6 @@ class Pokemon {
   final String imageUrl;
   final List<String> types;
   final List<String> weaknesses;
-  final List<String> moves; // Nuevos ataques principales
 
   Pokemon({
     required this.id,
@@ -12,7 +11,6 @@ class Pokemon {
     required this.imageUrl,
     required this.types,
     required this.weaknesses,
-    required this.moves, // Agregando ataques al constructor
   });
 
   factory Pokemon.fromJson(Map<String, dynamic> json) {
@@ -32,16 +30,6 @@ class Pokemon {
         .map((type) => type['type']['name'].toString().capitalize())
         .toList();
     
-    // Extraer ataques principales (primeros 4 movimientos)
-    final List<String> moves = [];
-    if (json['moves'] != null && json['moves'] is List) {
-      final movesList = json['moves'] as List;
-      for (int i = 0; i < movesList.length && i < 4; i++) {
-        final moveName = movesList[i]['move']['name'].toString().replaceAll('-', ' ').capitalize();
-        moves.add(moveName);
-      }
-    }
-    
     // Las debilidades no vienen directamente en la API, se calcularán en el servicio
     // Por ahora dejamos una lista vacía
     final List<String> weaknesses = [];
@@ -52,7 +40,6 @@ class Pokemon {
       imageUrl: imageUrl,
       types: types,
       weaknesses: weaknesses,
-      moves: moves, // Agregando ataques al return
     );
   }
 }

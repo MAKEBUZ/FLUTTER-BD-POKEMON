@@ -1,32 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/pokemon_controller.dart';
-import '../models/pokemon_model.dart';
 
 class PokemonDetailView extends StatelessWidget {
-  final Pokemon pokemon;
-  
-  const PokemonDetailView({super.key, required this.pokemon});
+  final PokemonController controller = Get.find<PokemonController>();
+
+  PokemonDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final PokemonController controller = Get.find<PokemonController>();
-    return Scaffold(
+    return Obx(() {
+      final pokemon = controller.pokemon.value;
+      if (pokemon == null) return const Scaffold(body: Center(child: Text('No hay datos disponibles')));
+
+      return Scaffold(
         appBar: AppBar(
           title: Text(pokemon.name),
           backgroundColor: Color(controller.getBackgroundColor()),
-          actions: [
-            // Botón de favorito (estrella)
-            Obx(() => IconButton(
-              icon: Icon(
-                controller.isFavorite.value ? Icons.star : Icons.star_border,
-                color: controller.isFavorite.value ? Colors.yellow : Colors.white,
-                size: 28,
-              ),
-              onPressed: controller.toggleFavorite,
-              tooltip: controller.isFavorite.value ? 'Remover del equipo' : 'Agregar al equipo',
-            )),
-          ],
         ),
         body: Container(
           decoration: BoxDecoration(
@@ -124,42 +114,6 @@ class PokemonDetailView extends StatelessWidget {
                                           ))
                                       .toList(),
                                 ),
-                          const SizedBox(height: 20),
-
-                          // Ataques principales
-                          const Text(
-                            'Ataques Principales:',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 10),
-                          pokemon.moves.isEmpty
-                              ? const Text('No se encontraron ataques')
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: pokemon.moves
-                                      .map((move) => Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 4),
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding: const EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Color(controller.getBackgroundColor()).withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(8),
-                                                border: Border.all(
-                                                  color: Color(controller.getBackgroundColor()).withOpacity(0.3),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                '• $move',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ))
-                                      .toList(),
-                                ),
                         ],
                       ),
                     ),
@@ -170,5 +124,6 @@ class PokemonDetailView extends StatelessWidget {
           ),
         ),
       );
+    });
   }
 }

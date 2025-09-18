@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'views/main_navigation.dart';
-import 'models/favorite_pokemon.dart';
-import 'models/custom_move.dart';
-import 'models/pokemon_custom_moves.dart';
+import 'views/home_view.dart';
+import 'models/team_pokemon_model.dart';
+import 'services/team_service.dart';
+import 'services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,12 +12,16 @@ void main() async {
   // Inicializar Hive
   await Hive.initFlutter();
   
-  // Registrar adaptadores
-  Hive.registerAdapter(FavoritePokemonAdapter());
-  Hive.registerAdapter(CustomMoveAdapter());
-  Hive.registerAdapter(PokemonCustomMovesAdapter());
+  // Registrar adaptadores de Hive
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(TeamPokemonAdapter());
+  }
   
-  runApp(const MyApp());
+  // Inicializar servicios
+  await TeamService.init();
+  await DatabaseService.isDatabaseReady();
+  
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -32,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: MainNavigation(),
+      home: HomeView(),
       debugShowCheckedModeBanner: false,
     );
   }
